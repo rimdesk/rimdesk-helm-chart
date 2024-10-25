@@ -1,0 +1,60 @@
+{{ if .Values.cronJob.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.cronJob.name }}
+  namespace: {{ .Values.cronJob.namespace }}
+spec:
+  failedJobsHistoryLimit: {{ .Values.cronJob.failedJobsHistoryLimit | default 1 }}
+  successfulJobsHistoryLimit: {{ .Values.cronJob.successfulJobsHistoryLimit | default 3 }}
+  startingDeadlineSeconds: {{ .Values.cronJob.startingDeadlineSeconds }}
+  concurrencyPolicy: {{ .Values.cronJob.concurrencyPolicy | default "Forbid" | title }}
+  schedule: {{ .Values.cronJob.schedule | quote }}
+  suspend: {{  .Values.cronJob.suspend | default false }}
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: {{ .Values.cronJob.ttlSecondsAfterFinished | default 100 }}
+      suspend: {{ .Values.cronJob.suspend | default false }}
+      parallelism: {{ .Values.cronJob.parallelism | default 1 }}
+      completions: {{ .Values.cronJob.completions | default 5 }}
+      activeDeadlineSeconds: {{ .Values.cronJob.activeDeadlineSeconds }}
+      completionMode: {{ .Values.cronJob.completionMode | default "NonIndexed" | title }}
+      backoffLimit: {{ .Values.cronJob.backoffLimit | default 5 }}
+      backoffLimitPerIndex: {{ .Values.cronJob.backoffLimitPerIndex }}
+      template:
+        {{ if and .Values.cronJob.metadata (not (empty .Values.cronJob.metadata)) }}
+        metadata:
+          {{ range $k, $v := .Values.cronJob.metadata }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+        {{- end }}
+        spec:
+          {{ if and .Values.cronJob.containers (not (empty .Values.cronJob.containers ) ) }}
+          containers:
+            {{ range .Values.cronJob.containers }}
+            - name: {{ .name }}
+              image: {{ .image }}
+              imagePullPolicy: {{ .imagePullPolicy }}
+              {{ if or (.secretMap) (.configMap) }}
+              envFrom:
+              {{ if .secretMap }}
+                - secretRef:
+                    name: {{ .secretMap.name }}
+              {{ end }}
+
+              {{ if .configMap }}
+                - configMapRef:
+                    name: {{ .configMap.name }}
+              {{ end }}
+
+              {{ end }}
+              {{ if and .command (not (empty .command)) }}
+              command:
+                {{ range .command }}
+                - {{ . }}
+                {{ end }}
+              {{ end }}
+            {{ end }}
+          {{end }}
+          restartPolicy: {{ .Values.cronJob.restartPolicy }}
+{{- end }}

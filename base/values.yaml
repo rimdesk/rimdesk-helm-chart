@@ -1,0 +1,175 @@
+deployment:
+  name: fraud-service
+  enabled: false
+  namespace: flow
+  replicaCount: 1
+  restartPolicy: Always
+  args: [ ]
+  image:
+    repository: gfacratharidazwe.azurecr.io
+    tag: latest
+    pullPolicy: Always
+  ports: { }
+
+service:
+  name: fraud-service
+  enabled: false
+  type: ClusterIP
+  namespace: flow
+  ports: { }
+
+resources:
+  enabled: false
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+
+configMap:
+  enabled: false
+  name: fraud-service
+  namespace: flow
+  data: { }
+
+secrets:
+  enabled: false
+  namespace: default
+  name: flow
+  data: { }
+
+certificate:
+  enabled: false
+  name: ''
+  namespace: ''
+  secretName: ''
+  issuerRef: ''
+  commonName: ''
+  dnsNames: { }
+
+gateway:
+  enabled: false
+  name: ''
+  namespace: ''
+  specSelector: ''
+  servers: { }
+
+virtualService:
+  enabled: false
+  name: fraud-service
+  gateways:
+    - api-gateway
+  httpRoutes:
+    - name: fraud-service
+      corsPolicy:
+        allowHeaders:
+          - authorization
+          - content-type
+        allowMethods:
+          - GET
+          - PUT
+          - POST
+          - PATCH
+          - DELETE
+      match:
+        - uri:
+            prefix: /v1/fraud
+      route:
+        - destination:
+            host: fraud-service.default.svc.cluster.local
+            port:
+              number: 8080
+  tcpRoutes:
+    - match:
+        - port: 444
+      route:
+        - destination:
+            host: fraud-service.default.svc.cluster.local
+            port:
+              number: 444
+  namespace: flow
+  host: api.1flow.org
+
+destinationRule:
+  enabled: false
+  name: ''
+  namespace: ''
+  host: ''
+  trafficPolicy:
+    loadBalancer:
+      simple: ''
+  subsets:
+    - name: ''
+      labels:
+        version: v3
+      trafficPolicy:
+        loadBalancer:
+          simple: ''
+
+cronJob:
+  enabled: false
+  name: ''
+  namespace: default
+  schedule: "59 23 28-31 * *"
+  containers: { }
+  metadata: { }
+
+persistentVolume:
+  enabled: false
+  name: ''
+  namespace: ''
+  labelType: ''
+  storage:
+    className: 'default'
+    capacity: '10Gi'
+  accessModes:
+    - ReadWriteOnce
+  hostPath: '/mnt/data'
+
+persistentVolumeClaim:
+  name: ''
+  namespace: ''
+  enabled: false
+  accessModes:
+    - ReadWriteOnce
+  storage: 16Gi
+
+argocd:
+  name: ' '
+  enabled: false
+  namespace: ' '
+  projectName: ''
+  sources: [ ]
+  sync:
+    automated:
+      prune: 'true'
+      selfHeal: 'true'
+    options:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - Validate=false
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+    retry:
+      limit: '2'
+      backoffDuration: '5s'
+      backOffMaxDuration: '3m0s'
+      backOffFactor: '2'
+  destination:
+    name: ''
+    namespace: ''
+    server: 'https://kubernetes.default.svc'
+  repository:
+    url: ''
+    path: ''
+    targetRevision: ''
+    chart: ''
+    valueFiles: { }
+  values: { }

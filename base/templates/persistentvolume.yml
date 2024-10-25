@@ -1,0 +1,19 @@
+{{ if .Values.persistentVolume.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.persistentVolume.name}}
+  namespace: {{ .Values.persistentVolume.namespace }}
+  labels:
+    type: {{ .Values.persistentVolume.labelType}}
+spec:
+  storageClassName: {{ .Values.persistentVolume.storage.className}}
+  capacity:
+    storage: {{ .Values.persistentVolume.storage.capacity}}
+  accessModes:
+    {{- range .Values.persistentVolume.accessModes }}
+    - {{ . }}
+    {{- end }}
+  hostPath:
+    path: {{ .Values.persistentVolume.hostPath}}
+{{- end }}

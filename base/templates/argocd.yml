@@ -1,0 +1,39 @@
+{{ if .Values.argocd.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.argocd.name }}
+  namespace: {{ .Values.argocd.namespace }}
+spec:
+  destination:
+    name: {{ .Values.argocd.destination.name }}
+    namespace: {{ .Values.argocd.destination.namespace }}
+    server: {{ .Values.argocd.destination.server }}
+  source:
+    path: {{ .Values.argocd.repository.path }}
+    repoURL: {{ .Values.argocd.repository.url }}
+    targetRevision: {{ .Values.argocd.repository.targetRevision }}
+    chart: {{ .Values.argocd.repository.chart }}
+    helm:
+      valueFiles:
+          {{- range .Values.argocd.repository.valueFiles }}
+        - {{ . }}
+          {{- end }}
+      values: {{ .Values.argocd.values | toYaml | indent 8 }}
+  sources: {{ .Values.argocd.sources }}
+  project: {{ .Values.argocd.projectName }}
+  syncPolicy:
+    automated:
+      prune: {{ .Values.argocd.sync.automated.prune }}
+      selfHeal: {{ .Values.argocd.sync.automated.selfHeal }}
+    syncOptions:
+        {{- range .Values.argocd.sync.options }}
+      - {{ . }}
+        {{- end }}
+    retry:
+      limit: {{ .Values.argocd.sync.retry.limit }}
+      backoff:
+        duration: {{ .Values.argocd.sync.retry.backoffDuration }}
+        maxDuration: {{ .Values.argocd.sync.retry.backOffMaxDuration }}
+        factor: {{ .Values.argocd.sync.retry.backOffFactor }}
+{{ end }}

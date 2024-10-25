@@ -1,0 +1,60 @@
+{{ if .Values.deployment.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Values.deployment.namespace }}
+  labels:
+    app: {{ .Values.deployment.name }}
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.name }}
+  template:
+    metadata:
+      name: {{ .Values.deployment.name }}
+      labels:
+        app: {{ .Values.deployment.name }}
+    spec:
+      containers:
+        - name: {{ .Values.deployment.name }}
+          image: {{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}
+          imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
+          {{ if .Values.deployment.args }}
+          args:
+            {{- range .Values.deployment.args }}
+            - {{ . | quote }}
+            {{- end }}
+          {{ end }}
+          {{ if .Values.resources.enabled }}
+          ports:
+            {{- range .Values.deployment.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: {{ .protocol }}
+            {{- end }}
+          {{- end }}
+
+          {{ if .Values.resources.enabled }}
+          resources:
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+          {{- end }}
+          {{ if or (.Values.configMap.enabled) (.Values.secrets.enabled) }}
+          envFrom:
+          {{ if .Values.configMap.enabled}}
+            - configMapRef:
+                name: {{ .Values.configMap.name }}
+            {{ if .Values.secrets.enabled }}
+            - secretRef:
+                name: {{ .Values.secrets.name }}
+            {{- end }}
+          {{- end }}
+          {{- end }}
+      restartPolicy: {{ .Values.deployment.restartPolicy}}
+{{ end }}

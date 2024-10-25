@@ -1,0 +1,32 @@
+{{ if .Values.destinationRule.enabled }}
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: {{ .Values.destinationRule.name }}
+  namespace: {{ .Values.destinationRule.namespace }}
+spec:
+  host: {{ .Values.destinationRule.host }}
+  trafficPolicy:
+    loadBalancer:
+      simple: {{ .Values.destinationRule.trafficPolicy.loadBalancer.simple | upper }}
+    {{ if and .Values.destinationRule.portLevelSettings (not (empty .Values.destinationRule.portLevelSettings )) }}
+    portLevelSettings:
+      {{ range .Values.destinationRule.portLevelSettings }}
+      - port:
+          number: {{ .port.number }}
+        loadBalancer:
+          simple: {{ .loadBalancer.simple | upper }}
+      {{- end }}
+    {{- end }}
+    {{ if .Values.destinationRule.subsets}}
+    subsets:
+      {{ range .Values.destinationRule.subsets }}
+      - name: {{ .name }}
+        labels:
+          version: {{ .labels.version }}
+        trafficPolicy:
+          loadBalancer:
+            simple: {{ .trafficPolicy.loadBalancer.simple | upper }}
+      {{- end }}
+    {{- end }}
+{{- end }}
