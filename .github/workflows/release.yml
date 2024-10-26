@@ -20,10 +20,20 @@ jobs:
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: Update Chart Version
+        run: |
+          chmod +x ./update-chart-version.sh
+          ./update-chart-version.sh
+
+      - name: Commit Updated Version
+        run: |
+          git add charts/Chart.yaml
+          git commit -m "Update chart version"
+          git push
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         with:
-          charts_dir: base
+          charts_dir: charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
