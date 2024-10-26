@@ -27,13 +27,13 @@ jobs:
 
       - name: Commit Updated Version
         run: |
-          git add charts/Chart.yaml
+          git add charts/rimdesk-chart/Chart.yaml
           git commit -m "Update chart version"
           git push
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         with:
-          charts_dir: charts
+          charts_dir: charts/rimdesk-chart
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
