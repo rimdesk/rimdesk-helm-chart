@@ -3,6 +3,16 @@ entries:
   rimdesk-chart:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2024-10-26T15:16:18.341002071Z"
+    description: A Helm chart for Kubernetes
+    digest: 1ff70c2ee55333bb2d36806909b4d1cc5f02633e7e39eb132ccc156bd0289d16
+    name: rimdesk-chart
+    type: application
+    urls:
+    - https://github.com/rimdesk/rimdesk-helm-chart/releases/download/rimdesk-chart-1.0.10/rimdesk-chart-1.0.10.tgz
+    version: 1.0.10
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2024-10-26T15:14:06.536356185Z"
     description: A Helm chart for Kubernetes
     digest: 65bb66c2db84e58160bd00dbf8c66bca7e0dec57720dd760b30bdc1455131d81
@@ -11,4 +21,4 @@ entries:
     urls:
     - https://github.com/rimdesk/rimdesk-helm-chart/releases/download/rimdesk-chart-1.0.9/rimdesk-chart-1.0.9.tgz
     version: 1.0.9
-generated: "2024-10-26T15:14:06.536363308Z"
+generated: "2024-10-26T15:16:18.341010897Z"
