@@ -33,7 +33,7 @@ jobs:
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
-        with:
-          charts_dir: charts/rimdesk-chart
+#        with:
+#          charts_dir: charts/rimdesk-chart
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
